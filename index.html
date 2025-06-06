@@ -37,9 +37,9 @@
 
         .chat-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             height: 95vh;
-            max-height: 700px;
+            max-height: 90vh;
             background-color: var(--secondary-bg);
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -113,6 +113,14 @@
             color: var(--text-color);
             align-self: flex-start;
             border-bottom-left-radius: 4px;
+        }
+
+        .llm-message p:first-child {
+            margin-top: 0;
+        }
+
+        .llm-message p:last-child {
+            margin-bottom: 0;
         }
 
         .chat-input-area {
@@ -246,10 +254,12 @@
             });
         }
 
-        let apiKey = '';
+        const IS_LOCAL_ENV = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.endsWith('.local') || window.location.protocol === 'file:';
+        // The API key is now handled by the Cloudflare Worker.
+        // We need the URL of the Cloudflare Worker.
+        // IMPORTANT: Replace this with your actual Cloudflare Worker URL
+        const CLOUDFLARE_WORKER_URL = 'https://llm-proxy.jamiematthews485182.workers.dev/';
         let projectContext = '';
-        const GITHUB_TOKEN_PLACEHOLDER = '{{ GITHUB_TOKEN_FROM_SECRETS }}';
-
 
         function estimateTokens(text) {
             // Rough estimate: 1 token ~ 4 characters.
@@ -270,83 +280,23 @@
         }
 
         async function initializeAppAndLoadContext() {
-            const hostname = window.location.hostname;
-            const protocol = window.location.protocol;
-            let apiKeySource = '';
-            console.log(`Initializing App. Hostname: ${hostname}, Protocol: ${protocol}`);
-
-            // Broader check for local development environments
-            const isLocalEnv = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.local') || protocol === 'file:';
-            console.log('Is considered local environment?', isLocalEnv);
-
-            if (isLocalEnv) {
-                const envUrl = './.env';
-                // addMessageToChat(`Running locally (hostname: ${hostname}). Attempting to load API key from ${envUrl}...`, 'system', true); // User request: Remove
-                console.log(`Attempting to fetch '${envUrl}'`);
-                try {
-                    const response = await fetch(envUrl, { cache: "no-store" });
-                    console.log(`'${envUrl}' fetch response status: ${response.status}, ok: ${response.ok}`);
-                    if (response.ok) {
-                        const envText = await response.text();
-                        console.log(`'${envUrl}' content (first 100 chars):`, envText ? envText.substring(0,100) + "..." : "empty");
-                        const envConfig = parseEnv(envText);
-                        console.log("Parsed .env config:", envConfig);
-                        if (envConfig.GITHUB_TOKEN && envConfig.GITHUB_TOKEN.trim() !== "") {
-                            apiKey = envConfig.GITHUB_TOKEN.trim();
-                            apiKeySource = '.env file';
-                            // addMessageToChat('API key loaded successfully from .env file.', 'system'); // User request: Remove
-                            console.log('API key loaded successfully from .env file.');
-                        } else {
-                            addMessageToChat('GITHUB_TOKEN not found or is empty in .env file. Please ensure it is set correctly.', 'system', true); // Keep error
-                            apiKey = '';
-                        }
-                    } else {
-                        let errorMsg = `.env file not found or not accessible (status: ${response.status}). `;
-                        if (response.status === 404) {
-                            errorMsg += "Ensure the .env file is in the same directory as index.html and your http-server can serve dotfiles. ";
-                        }
-                        errorMsg += "Please create/check it with your GITHUB_TOKEN.";
-                        addMessageToChat(errorMsg, 'system', true); // Keep error
-                        apiKey = '';
-                    }
-                } catch (error) {
-                    console.error('Error loading .env file:', error);
-                    addMessageToChat(`Error loading .env file: ${error.message}. This might be a network issue or a CORS problem if running from file:// protocol directly without a server. Please ensure it exists and is accessible.`, 'system', true); // Keep error
-                    apiKey = '';
-                }
-            } else {
-                apiKey = GITHUB_TOKEN_PLACEHOLDER;
-                apiKeySource = 'GitHub Secrets (placeholder)';
-                // addMessageToChat(`Running on deployed environment (hostname: ${hostname}). API key placeholder set.`, 'system', true); // User request: Remove
-                console.log("Running in deployed-like environment, using API key placeholder.");
-            }
-
+            console.log(`Initializing App. Cloudflare Worker URL: ${CLOUDFLARE_WORKER_URL}`);
             let contextLoadedSuccessfully = false;
-            if (apiKey) { // Proceed if API key is set (either real or placeholder)
-                // addMessageToChat(`API Key set from ${apiKeySource}. Loading project documents...`, 'system'); // User request: Remove
-                console.log(`API Key is set (source: ${apiKeySource}). Loading project documents...`);
-                contextLoadedSuccessfully = await loadProjectContext();
+
+            if (CLOUDFLARE_WORKER_URL === 'YOUR_CLOUDFLARE_WORKER_URL_HERE' || !CLOUDFLARE_WORKER_URL) {
+                addMessageToChat('Cloudflare Worker URL is not configured in index.html. Please replace YOUR_CLOUDFLARE_WORKER_URL_HERE with your actual worker URL. Chat functionality will be unavailable.', 'system', true);
             } else {
-                 // Error message for no API key already shown by previous block.
-                 // Ensure initial message reflects this if not already updated.
-                const currentInitialMsgElement = document.getElementById('initialStatusMessage') || document.getElementById('statusMessageUpdated');
-                if (currentInitialMsgElement && currentInitialMsgElement.textContent.startsWith('Initializing')) {
-                    addMessageToChat('API Key not configured. Chat functionality will be limited.', 'system', true);
+                console.log("Cloudflare Worker URL is set. Loading project documents...");
+                contextLoadedSuccessfully = await loadProjectContext();
+                if (contextLoadedSuccessfully) {
+                    addMessageToChat('Welcome! Ask me anything about the Universal Automation Wiki.', 'system', true);
+                } else {
+                     const currentInitialMsgElement = document.getElementById('initialStatusMessage') || document.getElementById('statusMessageUpdated');
+                    if (currentInitialMsgElement && currentInitialMsgElement.textContent.startsWith('Initializing')) {
+                        addMessageToChat('Failed to load project documents. Some information may be missing.', 'system', true);
+                    }
                 }
             }
-
-            if (apiKey && contextLoadedSuccessfully) {
-                 addMessageToChat('Welcome! Ask me anything about the Universal Automation Wiki.', 'system', true);
-            } else if (apiKey && !contextLoadedSuccessfully) {
-                // Error messages from loadProjectContext should have already been displayed.
-                // We can add a generic one if needed, or rely on specific errors.
-                // For now, assume loadProjectContext handles its own error display.
-                const currentInitialMsgElement = document.getElementById('initialStatusMessage') || document.getElementById('statusMessageUpdated');
-                 if (currentInitialMsgElement && currentInitialMsgElement.textContent.startsWith('Initializing')) {
-                    addMessageToChat('API key is set, but failed to load all project documents. Some information may be missing.', 'system', true);
-                 }
-            }
-            // If no API key, errors are already handled.
         }
 
         // Auto-load project context
@@ -533,13 +483,8 @@
             const userText = userInput.value.trim();
             if (!userText) return;
 
-            if (!apiKey || apiKey === GITHUB_TOKEN_PLACEHOLDER) {
-                let msg = 'API Key is not configured. ';
-                if (apiKey === GITHUB_TOKEN_PLACEHOLDER) {
-                    msg += 'The application seems to be running with a placeholder API key. If this is a deployed environment, the key might not have been injected correctly. The GitHub Models API will not work with this placeholder. ';
-                }
-                msg += 'Please ensure the API key is set up (via .env for local, or repository secrets for deployed).';
-                addMessageToChat(msg, 'system');
+            if (CLOUDFLARE_WORKER_URL === 'YOUR_CLOUDFLARE_WORKER_URL_HERE' || !CLOUDFLARE_WORKER_URL) {
+                addMessageToChat('Cannot send message: Cloudflare Worker URL is not configured in index.html.', 'system');
                 return;
             }
             
@@ -556,8 +501,10 @@
             userInput.style.height = 'auto';
             sendBtn.disabled = true;
 
+            let llmMessageDiv = null;
+            let accumulatedLlmContent = "";
+
             try {
-                // Ensure OpenAI SDK is loaded
                 if (typeof OpenAI === 'undefined') {
                     addMessageToChat('OpenAI SDK not loaded. Please check your internet connection or script tags.', 'system');
                     console.error('OpenAI SDK (window.OpenAI) is not defined.');
@@ -566,14 +513,14 @@
                 }
 
                 const client = new OpenAI({
-                    baseURL: 'https://models.github.ai/inference',
-                    apiKey: apiKey, // This is the GITHUB_TOKEN
-                    dangerouslyAllowBrowser: true // Required for client-side usage
+                    baseURL: CLOUDFLARE_WORKER_URL, // Point to your Cloudflare Worker
+                    apiKey: 'DUMMY_KEY_WILL_BE_REPLACED_BY_WORKER', // Provide a dummy key for the SDK
+                    dangerouslyAllowBrowser: true
                 });
 
                 const model = 'openai/gpt-4.1';
 
-                const response = await client.chat.completions.create({
+                const stream = await client.chat.completions.create({
                     model: model,
                     messages: [
                         {
@@ -588,24 +535,65 @@ ${projectContext}`
                         }
                     ],
                     temperature: 1.0,
-                    top_p: 1.0
+                    top_p: 1.0,
+                    stream: true, // Enable streaming
                 });
 
-                if (response.choices && response.choices[0] && response.choices[0].message) {
-                    addMessageToChat(response.choices[0].message.content, 'llm');
-                } else {
-                    addMessageToChat("Sorry, I couldn't get a valid response from the AI. The response format might be unexpected.", 'llm');
-                    console.error("Unexpected API response structure:", response);
+                for await (const chunk of stream) {
+                    const contentDelta = chunk.choices[0]?.delta?.content || "";
+                    if (contentDelta) {
+                        if (!llmMessageDiv) {
+                            // First chunk, create the message div
+                            llmMessageDiv = document.createElement('div');
+                            llmMessageDiv.classList.add('message', 'llm-message');
+                            
+                            // Check if initialStatusMessage exists and replace it if it's the "Initializing..." one
+                            const currentInitialMsgElement = document.getElementById('initialStatusMessage') || document.getElementById('statusMessageUpdated');
+                            // Only replace if it's the very first message placeholder
+                            if (currentInitialMsgElement && currentInitialMsgElement.id === 'initialStatusMessage' && currentInitialMsgElement.parentNode === chatMessages) {
+                                chatMessages.replaceChild(llmMessageDiv, currentInitialMsgElement);
+                                // Mark as replaced so it's not targeted again for replacement by other init messages
+                                currentInitialMsgElement.id = 'statusMessageReplacedByStream';
+                            } else if (currentInitialMsgElement && currentInitialMsgElement.id === 'statusMessageUpdated' && currentInitialMsgElement.parentNode === chatMessages && currentInitialMsgElement.textContent.startsWith('Welcome!')) {
+                                // If the "Welcome!" message is there, append after it.
+                                chatMessages.appendChild(llmMessageDiv);
+                            }
+                            else {
+                                chatMessages.appendChild(llmMessageDiv);
+                            }
+                        }
+                        accumulatedLlmContent += contentDelta;
+                        if (window.marked) {
+                            llmMessageDiv.innerHTML = marked.parse(accumulatedLlmContent);
+                        } else {
+                            llmMessageDiv.textContent = accumulatedLlmContent; // Fallback
+                        }
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                    if (chunk.choices[0]?.finish_reason) { // Check for any finish_reason
+                        console.log("Stream finished with reason:", chunk.choices[0].finish_reason);
+                        break; // Exit loop once a finish reason is received
+                    }
                 }
+                 if (!accumulatedLlmContent && !llmMessageDiv) {
+                    addMessageToChat("Received an empty response or stream from the AI.", 'llm');
+                }
+
             } catch (error) {
-                console.error("Error calling GitHub Models API:", error);
-                let errorMessage = "Sorry, I encountered an error while contacting the AI. Please check your GitHub Token and internet connection.";
-                if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
-                    errorMessage += ` Details: ${error.response.data.error.message}`;
-                } else if (error.message) {
-                    errorMessage += ` Details: ${error.message}`;
+                console.error("Error calling GitHub Models API or during stream:", error);
+                let errorMessageText = "Sorry, I encountered an error while contacting the AI.";
+                if (error.message) {
+                    errorMessageText += ` Details: ${error.message}`;
                 }
-                addMessageToChat(errorMessage, 'llm');
+                
+                if (llmMessageDiv && llmMessageDiv.parentNode === chatMessages) {
+                    const errorSpan = document.createElement('span');
+                    errorSpan.style.color = 'var(--error-color)';
+                    errorSpan.textContent = `\n\n[Error: ${error.message || 'Failed to complete streaming.'}]`;
+                    llmMessageDiv.appendChild(errorSpan);
+                } else {
+                    addMessageToChat(errorMessageText, 'llm');
+                }
             } finally {
                 sendBtn.disabled = false;
             }
