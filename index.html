@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Automation Wiki Q&A</title>
+    <!-- PDF.js via traditional CDN script tags -->
+    <script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+    <script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"></script>
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- OpenAI will be imported as an ES module in the script below -->
+    <style>
+        :root {
+            --primary-bg: #f4f6f8;
+            --secondary-bg: #ffffff;
+            --text-color: #333333;
+            --primary-accent: #0A5E95;
+            --primary-accent-hover: #084a78;
+            --border-color: #e0e0e0;
+            --user-msg-bg: #e1f5fe;
+            --llm-msg-bg: #f1f1f1;
+            --button-text-color: #ffffff;
+            --error-color: #d32f2f;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }        body {
+            font-family: var(--font-family);
+            background-color: var(--primary-bg);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            height: 95vh;
+            max-height: 700px;
+            background-color: var(--secondary-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 15px 20px;
+            background-color: var(--primary-accent);
+            color: var(--button-text-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .chat-header h1 {
+            margin: 0;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        /* .setup-section, .setup-section.show, and .api-input removed */
+
+        /* .file-upload-area and .file-input removed */
+
+        .chat-header button {
+            background-color: var(--secondary-bg);
+            color: var(--primary-accent);
+            border: 1px solid var(--primary-accent);
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s;
+            margin-left: 10px;
+        }
+
+        .chat-header button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 75%;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+
+        .user-message {
+            background-color: var(--user-msg-bg);
+            color: var(--text-color);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .llm-message {
+            background-color: var(--llm-msg-bg);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-input-area {
+            border-top: 1px solid var(--border-color);
+            padding: 15px 20px;
+            background-color: var(--secondary-bg);
+            display: flex; /* Changed for direct input-flex-container */
+            gap: 10px;    /* Moved gap here */
+        }
+
+        /* Removed .pdf-upload-area */
+
+        /* .input-flex-container is now .chat-input-area itself */
+        #userInput {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1em;
+            resize: none;
+            min-height: 40px; 
+            max-height: 120px; 
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+
+        #sendBtn {
+            background-color: var(--primary-accent);
+            color: var(--button-text-color);
+            border: none;
+            padding: 0 20px; /* Adjusted padding as it's the only button now */
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            align-self: flex-end; /* Align button with bottom of textarea if it grows */
+            height: 46px; /* Match typical height of single line textarea + padding */
+        }
+        
+        #sendBtn:hover {
+            background-color: var(--primary-accent-hover);
+        }
+        
+        #sendBtn:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                align-items: flex-start;
+                padding-top: 10px;
+            }
+            .chat-container {
+                max-height: none;
+                height: calc(100vh - 20px);
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .chat-header h1 {
+                font-size: 1.2em;
+            }
+
+            .chat-header button {
+                padding: 6px 10px;
+                font-size: 0.9em;
+            }
+
+            .chat-messages {
+                padding: 15px;
+            }
+
+            .message {
+                max-width: 85%;
+                font-size: 0.95em;
+            }
+            
+            .chat-input-area {
+                padding: 10px 15px;
+            }
+
+            #userInput {
+                padding: 10px;
+            }
+
+            #sendBtn {
+                padding: 10px 15px;
+                font-size: 0.95em;
+                height: 42px; /* Adjust for mobile */
+            }
+        }
+    </style>
+</head>
+<body>    <div class="chat-container">
+        <header class="chat-header">
+            <h1>Universal Automation Wiki Q&A</h1>
+            <div>
+                <button id="resetChatBtn">Reset Chat</button>
+            </div>
+        </header>
+
+        <!-- Setup section removed -->
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message llm-message" id="initialStatusMessage">Initializing... Please wait.</div>
+        </div>
+
+        <div class="chat-input-area">
+            <textarea id="userInput" placeholder="Ask a question..." rows="1"></textarea>
+            <button id="sendBtn">Send</button>
+        </div>
+    </div>    <script type="module">
+        // Import OpenAI SDK as an ES module from esm.sh (handles internal dependencies)
+        import OpenAI from 'https://esm.sh/openai@4.29.2';
+
+        // pdfjsLib will be available globally from its CDN script tag
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const resetChatBtn = document.getElementById('resetChatBtn');
+        const initialStatusMessage = document.getElementById('initialStatusMessage');
+
+        // Configure marked.js for breaks
+        if (window.marked) {
+            marked.setOptions({
+                breaks: true, // Convert GFM line breaks to <br>
+                gfm: true // Enable GitHub Flavored Markdown
+            });
+        }
+
+        let apiKey = '';
+        let projectContext = '';
+        const GITHUB_TOKEN_PLACEHOLDER = '{{ GITHUB_TOKEN_FROM_SECRETS }}';
+
+
+        function estimateTokens(text) {
+            // Rough estimate: 1 token ~ 4 characters.
+            // For more complex scenarios, a proper tokenizer library would be better.
+            return Math.ceil((text || "").length / 4);
+        }
+
+        // Function to parse .env file content
+        function parseEnv(envContent) {
+            const env = {};
+            envContent.split('\n').forEach(line => {
+                const [key, ...valueParts] = line.split('=');
+                if (key && valueParts.length > 0) {
+                    env[key.trim()] = valueParts.join('=').trim();
+                }
+            });
+            return env;
+        }
+
+        async function initializeAppAndLoadContext() {
+            const hostname = window.location.hostname;
+            const protocol = window.location.protocol;
+            let apiKeySource = '';
+            console.log(`Initializing App. Hostname: ${hostname}, Protocol: ${protocol}`);
+
+            // Broader check for local development environments
+            const isLocalEnv = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.local') || protocol === 'file:';
+            console.log('Is considered local environment?', isLocalEnv);
+
+            if (isLocalEnv) {
+                const envUrl = './.env';
+                // addMessageToChat(`Running locally (hostname: ${hostname}). Attempting to load API key from ${envUrl}...`, 'system', true); // User request: Remove
+                console.log(`Attempting to fetch '${envUrl}'`);
+                try {
+                    const response = await fetch(envUrl, { cache: "no-store" });
+                    console.log(`'${envUrl}' fetch response status: ${response.status}, ok: ${response.ok}`);
+                    if (response.ok) {
+                        const envText = await response.text();
+                        console.log(`'${envUrl}' content (first 100 chars):`, envText ? envText.substring(0,100) + "..." : "empty");
+                        const envConfig = parseEnv(envText);
+                        console.log("Parsed .env config:", envConfig);
+                        if (envConfig.GITHUB_TOKEN && envConfig.GITHUB_TOKEN.trim() !== "") {
+                            apiKey = envConfig.GITHUB_TOKEN.trim();
+                            apiKeySource = '.env file';
+                            // addMessageToChat('API key loaded successfully from .env file.', 'system'); // User request: Remove
+                            console.log('API key loaded successfully from .env file.');
+                        } else {
+                            addMessageToChat('GITHUB_TOKEN not found or is empty in .env file. Please ensure it is set correctly.', 'system', true); // Keep error
+                            apiKey = '';
+                        }
+                    } else {
+                        let errorMsg = `.env file not found or not accessible (status: ${response.status}). `;
+                        if (response.status === 404) {
+                            errorMsg += "Ensure the .env file is in the same directory as index.html and your http-server can serve dotfiles. ";
+                        }
+                        errorMsg += "Please create/check it with your GITHUB_TOKEN.";
+                        addMessageToChat(errorMsg, 'system', true); // Keep error
+                        apiKey = '';
+                    }
+                } catch (error) {
+                    console.error('Error loading .env file:', error);
+                    addMessageToChat(`Error loading .env file: ${error.message}. This might be a network issue or a CORS problem if running from file:// protocol directly without a server. Please ensure it exists and is accessible.`, 'system', true); // Keep error
+                    apiKey = '';
+                }
+            } else {
+                apiKey = GITHUB_TOKEN_PLACEHOLDER;
+                apiKeySource = 'GitHub Secrets (placeholder)';
+                // addMessageToChat(`Running on deployed environment (hostname: ${hostname}). API key placeholder set.`, 'system', true); // User request: Remove
+                console.log("Running in deployed-like environment, using API key placeholder.");
+            }
+
+            let contextLoadedSuccessfully = false;
+            if (apiKey) { // Proceed if API key is set (either real or placeholder)
+                // addMessageToChat(`API Key set from ${apiKeySource}. Loading project documents...`, 'system'); // User request: Remove
+                console.log(`API Key is set (source: ${apiKeySource}). Loading project documents...`);
+                contextLoadedSuccessfully = await loadProjectContext();
+            } else {
+                 // Error message for no API key already shown by previous block.
+                 // Ensure initial message reflects this if not already updated.
+                const currentInitialMsgElement = document.getElementById('initialStatusMessage') || document.getElementById('statusMessageUpdated');
+                if (currentInitialMsgElement && currentInitialMsgElement.textContent.startsWith('Initializing')) {
+                    addMessageToChat('API Key not configured. Chat functionality will be limited.', 'system', true);
+                }
+            }
+
+            if (apiKey && contextLoadedSuccessfully) {
+                 addMessageToChat('Welcome! Ask me anything about the Universal Automation Wiki.', 'system', true);
+            } else if (apiKey && !contextLoadedSuccessfully) {
+                // Error messages from loadProjectContext should have already been displayed.
+                // We can add a generic one if needed, or rely on specific errors.
+                // For now, assume loadProjectContext handles its own error display.
+                const currentInitialMsgElement = document.getElementById('initialStatusMessage') || document.getElementById('statusMessageUpdated');
+                 if (currentInitialMsgElement && currentInitialMsgElement.textContent.startsWith('Initializing')) {
+                    addMessageToChat('API key is set, but failed to load all project documents. Some information may be missing.', 'system', true);
+                 }
+            }
+            // If no API key, errors are already handled.
+        }
+
+        // Auto-load project context
+        async function loadProjectContext() { // Returns true if context loaded successfully, false otherwise
+            console.log("Entering loadProjectContext for targeted truncation strategy.");
+            const fileConfigs = {
+                podcast: { name: 'podcast.txt', type: 'PODCAST TRANSCRIPT' },
+                webpage: { name: 'webpage.html.txt', type: 'WEBSITE CONTENT' },
+                marketing: { name: 'marketing.pdf', type: 'MARKETING DOCUMENT (PDF)' }
+            };
+            let loadedContents = { podcast: null, webpage: null, marketing: null };
+            let filesLoadedCount = 0;
+            let filesErroredCount = 0;
+            const MAX_PROJECT_CONTEXT_TOKENS = 6500;
+
+            if (window.pdfjsLib) {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+            } else {
+                addMessageToChat('PDF.js library not loaded. PDF processing will fail.', 'system', true);
+                console.error('PDF.js (window.pdfjsLib) not loaded.');
+            }
+
+            // Load all files first
+            for (const key of Object.keys(fileConfigs)) {
+                const config = fileConfigs[key];
+                console.log(`Attempting to load: ${config.name}`);
+                try {
+                    let content;
+                    if (config.name.endsWith('.pdf') && window.pdfjsLib) {
+                        const pdf = await pdfjsLib.getDocument(config.name).promise;
+                        let pdfText = '';
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const textContent = await page.getTextContent();
+                            pdfText += textContent.items.map(item => item.str).join(' ') + '\n';
+                        }
+                        content = pdfText;
+                    } else {
+                        const response = await fetch(config.name);
+                        if (response.ok) {
+                            content = await response.text();
+                        } else {
+                            addMessageToChat(`Could not load ${config.name}. Status: ${response.status}`, 'system', true);
+                            filesErroredCount++;
+                            continue;
+                        }
+                    }
+                    loadedContents[key] = content;
+                    filesLoadedCount++;
+                    console.log(`Successfully loaded ${config.name}`);
+                } catch (error) {
+                    addMessageToChat(`Error loading/processing ${config.name}: ${error.message}`, 'system', true);
+                    filesErroredCount++;
+                }
+            }
+
+            if (filesLoadedCount === 0) {
+                addMessageToChat('No project files could be loaded.', 'system', true);
+                projectContext = "";
+                return false;
+            }
+
+            // Assemble context with targeted truncation for podcast
+            let contextPieces = [];
+            const mainHeader = "UNIVERSAL AUTOMATION WIKI PROJECT CONTEXT:\n\n";
+            const mainFooter = "\n=== END OF PROJECT CONTEXT ===\n\n";
+            
+            contextPieces.push(mainHeader);
+
+            // Add webpage content
+            if (loadedContents.webpage) {
+                contextPieces.push(`=== ${fileConfigs.webpage.type} ===\n${loadedContents.webpage}\n`);
+            }
+            // Add marketing content
+            if (loadedContents.marketing) {
+                contextPieces.push(`=== ${fileConfigs.marketing.type} ===\n${loadedContents.marketing}\n`);
+            }
+            
+            // Calculate remaining token budget for podcast content
+            let podcastContent = loadedContents.podcast || "";
+            const podcastHeader = loadedContents.podcast ? `=== ${fileConfigs.podcast.type} ===\n` : "";
+            
+            // Tokens used by fixed parts (webpage, marketing, all headers/footers)
+            let fixedPartsTokens = estimateTokens(contextPieces.join('') + podcastHeader + mainFooter);
+            let availableTokensForPodcast = MAX_PROJECT_CONTEXT_TOKENS - fixedPartsTokens;
+            if (availableTokensForPodcast < 0) availableTokensForPodcast = 0;
+
+            const originalPodcastTokens = estimateTokens(podcastContent);
+            let podcastWasTruncated = false;
+
+            if (originalPodcastTokens > availableTokensForPodcast) {
+                const charsToKeepForPodcast = availableTokensForPodcast * 4; // Rough char count
+                podcastContent = podcastContent.substring(0, charsToKeepForPodcast);
+                podcastWasTruncated = true;
+                console.warn(`Podcast content truncated. Original: ${originalPodcastTokens} tokens, Allowed for content: ${availableTokensForPodcast} tokens. Kept ~${estimateTokens(podcastContent)} tokens of podcast.`);
+            }
+
+            if (loadedContents.podcast) { // Only add podcast section if it was loaded
+                 contextPieces.push(podcastHeader + podcastContent + "\n");
+            }
+            contextPieces.push(mainFooter);
+            projectContext = contextPieces.join('');
+            
+            const finalProjectContextTokens = estimateTokens(projectContext);
+            console.log(`Final estimated project context tokens: ${finalProjectContextTokens}`);
+
+            if (podcastWasTruncated) {
+                let truncationMsg = "Note: The 'podcast.txt' content was automatically shortened";
+                 if (availableTokensForPodcast <= 0 && originalPodcastTokens > 0 && loadedContents.podcast) {
+                    truncationMsg = "Note: The 'podcast.txt' content was significantly shortened or removed as other documents consumed most of the available space";
+                }
+                truncationMsg += ` to fit within the AI's limits (~${finalProjectContextTokens} total tokens). Details from the podcast might be omitted.`;
+                console.log(truncationMsg);
+            }
+            
+            console.log(`Processed ${filesLoadedCount} file(s). ${filesErroredCount > 0 ? `${filesErroredCount} file(s) failed to load/process.` : ''}`);
+            if (projectContext) console.log("Project Context Preview (first 200 chars):", projectContext.substring(0, 200) + "...");
+            
+            return filesLoadedCount > 0 && filesErroredCount === 0;
+        }
+        
+        // Auto-adjust textarea height
+        userInput.addEventListener('input', () => {
+            userInput.style.height = 'auto';
+            userInput.style.height = (userInput.scrollHeight) + 'px';
+            sendBtn.style.height = Math.max(46, userInput.scrollHeight + 2) + 'px';
+            if (window.innerWidth <= 768) {
+                sendBtn.style.height = Math.max(42, userInput.scrollHeight + 2) + 'px';
+            }
+        });
+
+        // Message sending
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+
+        resetChatBtn.addEventListener('click', () => {
+            chatMessages.innerHTML = '<div class="message llm-message">Chat reset. Load your project files and ask questions about the Universal Automation Wiki.</div>';
+            userInput.value = '';
+            userInput.style.height = 'auto';
+        });
+
+        function addMessageToChat(text, sender, isInitializationMessage = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+        
+            if (sender === 'user') {
+                messageDiv.classList.add('user-message');
+            } else if (sender === 'system') {
+                messageDiv.classList.add('llm-message');
+                messageDiv.style.backgroundColor = '#e8f5e8';
+            } else { // llm
+                messageDiv.classList.add('llm-message');
+            }
+            if (sender === 'llm' && window.marked) {
+                messageDiv.innerHTML = marked.parse(text); // Use innerHTML for parsed Markdown
+            } else {
+                messageDiv.textContent = text; // Keep textContent for user and system messages
+            }
+        
+            const currentInitialMsgElement = document.getElementById('initialStatusMessage');
+        
+            if (isInitializationMessage && currentInitialMsgElement) {
+                // If this is the first system message during init, update the placeholder
+                currentInitialMsgElement.textContent = text;
+                // Copy classes and style from the dynamically created messageDiv to the placeholder
+                currentInitialMsgElement.className = messageDiv.className;
+                currentInitialMsgElement.style.backgroundColor = messageDiv.style.backgroundColor;
+                // Change the ID to prevent it from being targeted as the "initial" message again
+                currentInitialMsgElement.id = 'statusMessageUpdated';
+                console.log("Initial status message updated.");
+            } else {
+                // For all subsequent messages, or if the placeholder is gone
+                chatMessages.appendChild(messageDiv);
+            }
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const userText = userInput.value.trim();
+            if (!userText) return;
+
+            if (!apiKey || apiKey === GITHUB_TOKEN_PLACEHOLDER) {
+                let msg = 'API Key is not configured. ';
+                if (apiKey === GITHUB_TOKEN_PLACEHOLDER) {
+                    msg += 'The application seems to be running with a placeholder API key. If this is a deployed environment, the key might not have been injected correctly. The GitHub Models API will not work with this placeholder. ';
+                }
+                msg += 'Please ensure the API key is set up (via .env for local, or repository secrets for deployed).';
+                addMessageToChat(msg, 'system');
+                return;
+            }
+            
+            if (!projectContext) {
+                // Attempt to load context if not already loaded (e.g. if API key was set after initial page load)
+                // Or, simply rely on the initial load and show error if still not present.
+                // For simplicity, we'll assume it should have been loaded after API key setup.
+                addMessageToChat('Project context is not loaded. Ensure files (podcast.txt, webpage.html.txt, marketing.pdf) are present and accessible.', 'system');
+                return;
+            }
+
+            addMessageToChat(userText, 'user');
+            userInput.value = '';
+            userInput.style.height = 'auto';
+            sendBtn.disabled = true;
+
+            try {
+                // Ensure OpenAI SDK is loaded
+                if (typeof OpenAI === 'undefined') {
+                    addMessageToChat('OpenAI SDK not loaded. Please check your internet connection or script tags.', 'system');
+                    console.error('OpenAI SDK (window.OpenAI) is not defined.');
+                    sendBtn.disabled = false;
+                    return;
+                }
+
+                const client = new OpenAI({
+                    baseURL: 'https://models.github.ai/inference',
+                    apiKey: apiKey, // This is the GITHUB_TOKEN
+                    dangerouslyAllowBrowser: true // Required for client-side usage
+                });
+
+                const model = 'openai/gpt-4.1';
+
+                const response = await client.chat.completions.create({
+                    model: model,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: `You are an expert assistant helping users understand the Universal Automation Wiki project. You have access to the complete project context including podcast transcripts, website content, and marketing materials. Answer questions accurately based on the provided information.
+
+${projectContext}`
+                        },
+                        {
+                            role: 'user',
+                            content: userText
+                        }
+                    ],
+                    temperature: 1.0,
+                    top_p: 1.0
+                });
+
+                if (response.choices && response.choices[0] && response.choices[0].message) {
+                    addMessageToChat(response.choices[0].message.content, 'llm');
+                } else {
+                    addMessageToChat("Sorry, I couldn't get a valid response from the AI. The response format might be unexpected.", 'llm');
+                    console.error("Unexpected API response structure:", response);
+                }
+            } catch (error) {
+                console.error("Error calling GitHub Models API:", error);
+                let errorMessage = "Sorry, I encountered an error while contacting the AI. Please check your GitHub Token and internet connection.";
+                if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+                    errorMessage += ` Details: ${error.response.data.error.message}`;
+                } else if (error.message) {
+                    errorMessage += ` Details: ${error.message}`;
+                }
+                addMessageToChat(errorMessage, 'llm');
+            } finally {
+                sendBtn.disabled = false;
+            }
+        }
+
+        // Initialize textarea height & load context
+        userInput.style.height = (userInput.scrollHeight) + 'px';
+        sendBtn.style.height = Math.max(46, userInput.scrollHeight + 2) + 'px';
+        if (window.innerWidth <= 768) {
+            sendBtn.style.height = Math.max(42, userInput.scrollHeight + 2) + 'px';
+        }
+
+        // Initialize the application
+        initializeAppAndLoadContext();
+        // This is the new async event handler for the "Save API Key" button click.
+        const handleSaveApiKeyClick = async () => {
+            console.log("handleSaveApiKeyClick event listener triggered."); // DEBUG
+            performApiKeySave(); // Call the synchronous part of saving the key
+
+            // Now, check conditions and load context
+            console.log(`[DEBUG] After performApiKeySave: apiKey='${apiKey}', projectContext is ${projectContext ? 'populated' : 'empty'}`); // CRITICAL DEBUG
+            if (apiKey && !projectContext) {
+                console.log("API key is set and projectContext is empty. Calling loadProjectContext from handleSaveApiKeyClick."); // DEBUG
+                await loadProjectContext();
+                console.log("loadProjectContext finished in handleSaveApiKeyClick."); // DEBUG
+            } else {
+                console.log("Conditions not met to call loadProjectContext from handleSaveApiKeyClick:", { apiKeySet: !!apiKey, projectContextLoaded: !!projectContext }); // DEBUG
+            }
+        };
+
+        // Programmatically add the event listener
+        const saveButton = document.getElementById('saveApiKeyBtn');
+        if (saveButton) {
+            saveButton.addEventListener('click', handleSaveApiKeyClick);
+            console.log("Event listener added to saveApiKeyBtn."); // DEBUG
+        } else {
+            console.error("Save API Key button (saveApiKeyBtn) not found in the DOM!");
+        }
+
+        // Initial attempt to load context if API key might be pre-filled or for robustness
+        // This won't run if API key is not set yet.
+        // Consider if apiKey could be pre-set by GitHub Actions injecting it.
+        // For now, primary trigger is after user enters token.
+        // If GITHUB_TOKEN is injected directly into the script by GH Actions, then loadProjectContext could be called directly on script load.
+        // Let's add a call on DOMContentLoaded, but it will only proceed if apiKey is somehow already set.
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log("DOMContentLoaded event fired."); // DEBUG
+            if (apiKey && !projectContext) { // apiKey would be empty string initially unless injected
+                 console.log("API key is set on DOMContentLoaded and projectContext is empty. Calling loadProjectContext."); // DEBUG
+                 await loadProjectContext();
+                 console.log("loadProjectContext finished in DOMContentLoaded."); // DEBUG
+            } else {
+                console.log("Conditions not met to call loadProjectContext from DOMContentLoaded:", {apiKeySet: !!apiKey, projectContextLoaded: !!projectContext}); // DEBUG
+            }
+            // If no API key yet, loadProjectContext will be called after user enters it via saveApiKey.
+        });
+    </script>
+</body>
+</html>

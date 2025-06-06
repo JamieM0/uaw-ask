@@ -1,0 +1,144 @@
+Welcome to the deep dive. Uh today we're zoning in, really focusing on just one thing, the universal automation wiki.
+Mhm.
+Think of this as your guide, your way to understand what this thing is, what it's trying to achieve, and well, why it might just change how we track the future of automation.
+Yeah, it's pretty ambitious project.
+Definitely. And our information, it's coming straight from the source, the wiki website itself, and a uh 2025 paper they put out, universal automation wiki. with iterative AI,
+right? So, we're looking directly at their vision.
+Exactly. Our mission today, get a clear view of this wiki. It's, you know, unique approach to mapping out the automation age.
+Yeah. We're going deep on their core ideas, the uh the methodology, the challenges they're actually trying to solve. Okay.
+It's quite a fascinating attempt really to bring some structure to a field that feels like it's moving incredibly fast, almost chaotically sometimes.
+Okay. So, let's unpack that. Why even build something like this? What are the kind of the current headaches or pain points in understanding automation that they're trying to fix.
+Well, the sources, they're pretty upfront about it.
+Yeah.
+Right now, information on automation is just scattered. You know,
+siloed.
+Totally siloed. You've got pockets of deep expertise in certain industries or specific research areas, but nothing connecting at all. There's no like central hub to see the big picture.
+Yeah. Like trying to predict the weather, looking only at your town's forecast.
+Exactly. You miss the bigger patterns. And another point they make is how much we rely on Well, expert opinion,
+which is valuable obviously, but
+but it can be biased, right?
+Yeah.
+Or maybe applied inconsistently. One expert's view here, another's totally different view over there,
+right? And that leads to another problem. They mentioned this lack of a clear timeline. When are we actually going to see major automation or, you know, the science fiction idea of full automation?
+It's mostly guesswork, isn't it?
+Not really based on solid uh data across the board.
+So, if we don't know where we are or really where we're going, it's tough to spot the actual roadblocks
+precisely. Where are the real technological gaps? What's actually holding things back?
+These are the big questions.
+And that's exactly what the Universal Automation Wiki aims to tackle.
+Yeah.
+Their solution, as they put it, is this unified datadriven platform.
+Okay.
+The goal is mapping and predicting automation progress everywhere using a consistent transparent method.
+So like a single source of truth for automation. That's Yeah, that's ambitious.
+It is. And their It goes even further. They explicitly state they want to track progress towards a uh technological singularity.
+Oh wow. Okay.
+Yeah. And also encourage automation tech development. Provide a structured way to understand what's possible and make all this knowledge accessible. Democratize it.
+So it's not just observing. It's trying to nudge things forward too.
+That seems to be the idea. Yeah.
+All right. The big why now question.
+What's shifted? Why is this project happening or at least so relevant right now?
+Good question. It seems like a confluence of factors.
+Yeah,
+the wiki itself really points to advances in large language models, LLMs.
+Oh, okay.
+These models can break down complex tasks, analyze text, structure information in ways that just weren't feasible on this scale before,
+right? You need powerful tools to dissect something as huge as global automation potential. And they also mention AI agents being on the forefront there.
+Yes, AI agent capabilities. So, think of AI designed to perform specific tasks autonomy. ly this lets the wiki get really granular.
+So
+by looking at the individual steps, the tiny actions needed for a bigger process, it enables this very detailed bottom-up view they're aiming for.
+Okay, got it.
+And then there's just the growing need. Industries, governments, they all want more realistic road maps for automation. Planning requires better forecasts than, you know, speculative guesses.
+And the tech for community knowledge systems like wikis is mature now.
+Seems like it. Yeah,
+we've seen wiks work elsewhere. Maybe automation's turn. Plus, let's face it, interest in automation is just exploding everywhere. People want this info.
+The demand is definitely there. Okay, let's dive into their core tech. This iterative AI and the bottomup design philosophy. You said it flips traditional planning.
+Yeah, it's quite interesting. So, iterative AI, what it does practically is break down really big complex tasks like say fully automate hospital logistics. Iterative AI chops that up into smaller pieces, automate supply delivery, Automate scheduling, automate recordkeeping.
+Okay. A hierarchy.
+Exactly. A tree structure. Each of those gets broken down further and further. But here's the key bit. At every level, there might be multiple ways to do it.
+Ah, so it's not just one linear path. It shows different potential solutions.
+Precisely. And that connects directly to their bottomup idea. Instead of starting with the grand vision, the fully automated hospital, and working backward,
+which can be kind of abstract, maybe ignore current limits,
+right? They Start with what we can do now.
+What technologies actually exist? What components are available? It's grounded in today's reality.
+That makes a lot of sense. Traditional top- down planning, like they point out, can sometimes feel a bit handwavy about the practical steps.
+Yeah. Maybe overly optimistic sometimes because it doesn't grapple with the immediate hurdles. This bottomup way, starting with proven tech, aims to build achievable paths
+and presumably makes it easier to see where the gaps are.
+Exactly. When you build from the bottom up, you clearly see where the tree branches are thin or where there just aren't many options yet. That highlights where the real innovation is needed.
+Okay, so iterative AI bottomup approach. What does this actually look like for someone visiting the wiki? What are the main features?
+Well, number one is what they call automation mapping.
+Okay,
+this is the visualization part
+using those interactive trees we talked about to show automation progress across different sectors. You can click around, explore industries, see the task breakdown, interactive trees. Yeah, that sounds way more engaging than just reading a report.
+Definitely. Then of course there's the iterative AI engine itself, the tech doing the breakdown. But crucially, it's communitydriven,
+meaning
+meaning users can chime in. They can give feedback, suggest different ways to automate a step, even vote on which approaches seem best.
+So it learns. It's not static. It evolves based on what the community thinks works.
+That's the core idea.
+Yeah.
+Which leads to the future predictions. Yeah.
+By analyzing all this data, the task tree, the tech availability, the community votes. They aim to offer databacked predictions about automation timelines.
+Databacked, not just opinion based. Okay, let's get into the weeds a bit more on how that works. The task breakdown and community feedback loop. How does that play out?
+Sure. So, the AI generates these trees showing different workflows for automating a task. Maybe three different ways to automate uh warehouse picking, for example.
+Okay.
+Then users could be engineers, researchers, even just enthusiasts. can look at these methods and provide input usually through questionnaires.
+What kind of input?
+Things like practicality, cost, efficiency, maybe unforeseen problems. Is this really the best way to do it?
+So, it's like crowdsourcing the review process for automation plans
+kind of. Yeah. A massive collaborative peer review and this feedback directly shapes the trees. If one approach gets consistently high ratings,
+it becomes the recommended path
+pretty much. It rises to the top. If another approach keeps getting flagged as flawed or too expensive, It might get downgraded, revised, maybe even pruned from the tree eventually. It's continuous improvement based on collective input.
+That sounds powerful. How does this stack up against say Wikipedia or a traditional expert report? They must see themselves as different.
+Oh, definitely. They draw some clear contrasts design-wise. Their bottomup structure is different from what they see as the flatter, sometimes fragmented info on a traditional wiki,
+right?
+And it's also different from the top down approach of some expert knowledge bases which might be less grounded in immediate practicalities
+and judging quality. That's always tricky with open platforms.
+Their answer is transparent objective metrics plus those community feedback scores we talked about
+as opposed to
+as opposed to say editor consensus and citation counts on a wiki which can be subjective or the sort of blackbox authority of some closed expert systems where you don't always see the reasoning.
+Okay. Metrics and community validation for reliability and the structure itself. the dynamic trees versus static articles or rigid frameworks.
+Exactly. They argue their structure is more adaptable. It can show multiple solutions easily, unlike a linear article, and it might be less resistant to new ideas than some established expert frameworks.
+What about predicting the future timelines?
+Well, traditional wikis often don't even try or it's pure speculation. Expert systems might offer forecasts, but may be biased by the experts views. The UAW aims for data backed forecast. test you can actually measure the accuracy of based on all the inputs
+and bias. How do they tackle that?
+Their argument is that the democratic voting system based on metrics is less prone to bias than say loud voices dominating a wiki discussion or potential echo chambers in expert groups.
+Interesting. Lowering the barrier to contribute to
+Yeah, the idea is quality speaks for itself through the metrics, not who you are or if you have editor approval. More inclusive. And finally, adaptability. They claim fast revolution through feedback compared to slow wiki updates. or change resistant expert models.
+So it's a whole different way of thinking about knowledge creation in a fastmoving field. How does that objective knowledge assessment work on the ground? What metrics are we talking about?
+They mentioned a few key types.
+Yeah,
+those community feedback scores, measuring perceives quality, then capability validation. Basically, how mature and reliable is a specific automation tech in the real world?
+Does it actually work well?
+Okay.
+And also So component availability.
+Yeah.
+Are the parts, the software, the hardware needed for this automation solution actually available and affordable? Combining these lets them calculate an automation readiness score.
+Uh so moving beyond could we automate this to how ready are we actually to automate this?
+Yeah.
+Based on real factors.
+Precisely. That seems incredibly useful. And this whole system relies heavily on what they call the feedback engine, the democratization part.
+Right. Tell me more about that.
+The core idea is simple. Anyone can contribute and have influence, but it's based on the quality and validation through metrics, not just shouting loudest. Users propose alternative automation methods for any step. The community votes the best rated approaches, the ones scoring well on metrics float to the top. They become the recognized sort of best practices within the system
+and it's ongoing. New tech emerges.
+Exactly. Users propose new capabilities reflecting new tech. The community vets them, refineses the pathways. The whole wiki is designed to constantly learn and adapt based on this collective intelligence. It's meant to be dynamic.
+Okay. So, who's this for? Who gets the most value out of this? Do they think
+they actually break it down quite clearly for, you know, enthusiasts or people interested in the future? It's a way to track progress towards big goals like the singularity if you're into that or just explore what's possible right now. You could even contribute to the mapping.
+Okay. And for businesses, industry
+huge potential there benchmarking their own automation level against the wider field. I identifying opportunities, seeing where techn is heading.
+What about planners, government, corporate strategy?
+Yeah, technology planners could use it to forecast trends, get a better handle on adoption timelines for planning investments or policy
+and R&D teams
+benchmarking their own tech readiness, finding gaps, identifying where the next breakthroughs are needed. So, yeah, quite a broad range.
+Seems like it could touch a lot of different areas. Now, if someone listening is intrigued, maybe wants to check it out or even contribute, how do they get involved?
+Pretty straightforward. First stop is the wiki itself
+universal automation.wiki just go explore
+okay
+for the more technically minded they have a GitHub presence the link is jmmia-gub that's where you can see development maybe contribute code
+got it any contact info
+yep they list contact at universalamationwiki and they mentioned Jamie Matthews as the main contact uh associated with the project it's also linked to QAB at Queens University Belfast supervised by Dr. John Bustard
+so plenty of ways in whether you're a coder, a domain expert, or just keenly interested.
+Absolutely. It really seems built for collaboration.
+Okay, so let's treat and wrap this up. What are the key things you want people to take away from our deep dive today on the universal automation wiki?
+I think the main thing is this is a really novel approach. It's trying to tackle the huge complex topic of automation's future using community intelligence and uh data in a structured way,
+right? The iterative AI, the bottomup design, Exactly. Grounded in what's real now, not just speculation. It aims for transparency and objectivity using metrics, which is quite different from how we often get this kind of information. It's an attempt to build a more reliable collective view of where automation is truly headed.
+A fascinating project. Okay, so here's something for you, our listener, to think about. How could a platform like this really change how we perceive technological progress? What does being wellinformed even mean when automation is advancing so quickly? And maybe more importantly, what What kinds of collaboration? What kinds of innovation could this kind of open, transparent system unlock that maybe the old siloed ways just couldn't? Something to chew on. Thanks for joining us for this deep dive. 

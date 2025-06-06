@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Automation Wiki</title>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/category.css">
+    <link rel="stylesheet" href="/assets/css/responsive.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Placeholder styles to prevent layout shift */
+        #header-placeholder {
+            min-height: 70px; /* Match header height */
+        }
+        #footer-placeholder {
+            min-height: 250px; /* Approximate height of footer */
+        }
+    </style>
+</head>
+<body>
+    <!-- Header placeholder to be filled by components.js -->
+    <div id="header-placeholder"></div>
+
+    <main>
+        
+        <!-- Audio Banner -->
+        <section class="audio-banner">
+            <p>Get an overview of the project</p>
+            <div class="audio-player-container">
+                <audio id="banner-audio" src="/assets/audio/podcast.mp3" preload="metadata"></audio>
+                <button id="play-pause-btn" aria-label="Play audio"><span id="play-icon">&#9654;</span></button>
+                <input type="range" id="seek-bar" value="0" aria-label="Audio seek bar">
+                <span id="time-display" class="time-display" aria-live="polite">0:00 / 0:00</span>
+            </div>
+            <button id="close-btn" aria-label="Close audio banner">&#10005;</button>
+        </section>
+        <section class="hero">
+            <div class="container">
+                <h1>Mapping the Future of Automation</h1>
+                <p class="hero-subtitle">Explore, contribute, and track automation progress across various domains with our collaborative wiki platform.</p>
+                <div class="hero-actions">
+                    <a href="#categories" class="button primary">Explore Categories</a>
+                    <a href="#how-it-works" class="button secondary">Learn How It Works</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="container">
+                <div class="section-header">
+                    <h2>What We Offer</h2>
+                    <p>Universal Automation Wiki provides a structured platform for understanding automation possibilities</p>
+                </div>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2"/>
+                                <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <h3>Automation Mapping</h3>
+                        <p>Visualise and track automation progress across different domains with interactive trees</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 3L5 7L9 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M5 7H15C18.3137 7 21 9.68629 21 13C21 16.3137 18.3137 19 15 19H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3>Iterative AI</h3>
+                        <p>Our technology breaks down complex tasks into hierarchical trees of steps for better understanding</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17 21V19C17 16.7909 15.2091 15 13 15H5C2.79086 15 1 16.7909 1 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M23 21V19C22.9986 17.1771 21.765 15.5857 20 15.13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M16 3.13C17.7699 3.58317 19.0078 5.17798 19.0078 7.005C19.0078 8.83202 17.7699 10.4268 16 10.88" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3>Community Driven</h3>
+                        <p>Contribute by providing feedback and voting on the best automation approaches</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 8V12L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M3.05 11C3.27151 7.72642 5.3004 4.87145 8.25518 3.64272C11.2099 2.41399 14.5383 3.03285 16.8 5.20001C19.0617 7.36717 19.9251 10.6939 19.05 13.75" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M22 16L19 19L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M19 19V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3>Future Predictions</h3>
+                        <p>Get insights on when full automation will be achievable for various topics</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mission" id="mission">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Our Mission</h2>
+                </div>
+                <div class="mission-content">
+                    <div class="mission-text">
+                        <p>We aim to track automation progress, encourage its development, and provide a structured way for users to explore automation possibilities. By mapping the path to the technological singularity, we help make it more accessible and understandable.</p>
+                        <p>Our collaborative approach brings together experts and enthusiasts to create a comprehensive resource for understanding what's possible with automation today and tomorrow.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="how-it-works" id="how-it-works">
+            <div class="container">
+                <div class="section-header">
+                    <h2>How It Works</h2>
+                </div>
+                <div class="process-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Task Breakdown</h3>
+                        <p>Our platform utilises Iterative AI to break down complex tasks into manageable steps, creating hierarchical trees of automation workflows.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Multiple Approaches</h3>
+                        <p>Each step can have multiple alternative breakdowns, allowing for diverse approaches to automation.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Community Feedback</h3>
+                        <p>Users provide feedback through questionnaires, helping us refine our automation trees and identify the most effective approaches.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <h3>Continuous Improvement</h3>
+                        <p>The system learns from user input, constantly evolving to provide better automation solutions.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New section for categories -->
+        <section class="categories" id="categories">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Browse Automation Categories</h2>
+                    <p>Explore our growing collection of automation trees organized by domain</p>
+                </div>
+                
+                <div class="category-grid">
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11 3H17V7H11V3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M11 11H17V15H11V11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M11 19H17V21H11V19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7 3H3V21H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3>Food Production</h3>
+                        <p>Automated systems for food processing, baking, beverage production, and more.</p>
+                        <a href="/food-production" class="category-link">Explore Food Production</a>
+                    </div>
+                    
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 16l-4 4-4-4M4 8l4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M4 16v-3a7 7 0 0 1 7-7h9M20 8v3a7 7 0 0 1-7 7H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3>Technology</h3>
+                        <p>Automation in computing, software development, telecommunications, and digital infrastructure.</p>
+                        <a href="/technology" class="category-link">Explore Technology</a>
+                    </div>
+                    
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3>Manufacturing</h3>
+                        <p>Automation technologies for industrial manufacturing across different sectors.</p>
+                        <a href="/manufacturing" class="category-link">Explore Manufacturing</a>
+                    </div>
+                    
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M16 3H1v18h15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M16 8l5 3-5 3V8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3>Transportation</h3>
+                        <p>Autonomous vehicles, logistics automation, and transportation systems.</p>
+                        <a href="/transportation" class="category-link">Explore Transportation</a>
+                    </div>
+                    
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3>Healthcare</h3>
+                        <p>Medical robotics, diagnostic automation, and healthcare delivery systems.</p>
+                        <a href="/healthcare" class="category-link">Explore Healthcare</a>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <polygon points="5,3 19,12 5,21" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <h3>Entertainment</h3>
+                        <p>Automated content creation, gaming systems, and entertainment production workflows.</p>
+                        <a href="/entertainment" class="category-link">Explore Entertainment</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="contribute">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Contribute</h2>
+                </div>
+                <div class="contribute-content">
+                    <div class="contribute-text">
+                        <p>Join us in shaping the future of automation! Explore our GitHub repository for technical details and ways to contribute.</p>
+                        <div class="contribute-actions">
+                            <a href="https://github.com/jamiem0/routines" target="_blank" class="button primary">View on GitHub</a>
+                            <a href="output" class="button secondary">Explore Examples</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer placeholder to be filled by components.js -->
+    <div id="footer-placeholder"></div>
+    
+    <!-- Load components.js first to ensure header/footer are loaded before other scripts -->
+    <script src="/assets/js/components.js"></script>
+    <script src="/assets/js/main.js"></script>
+</body>
+</html>

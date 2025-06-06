@@ -1,0 +1,24 @@
+{
+  "name": "universal-automation-wiki",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Universal Automation Wiki - Mapping the Future of Automation",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.0",
+    "fs": "^0.0.1-security",
+    "multer": "^1.4.5-lts.1",
+    "openai": "^4.104.0",
+    "pdf-parse": "^1.1.1",
+    "pdfjs-dist": "^5.3.31"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
