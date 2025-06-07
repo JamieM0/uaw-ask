@@ -1,63 +1,80 @@
 export default {
   async fetch(request, env) {
-    // Ensure this matches the path you are calling from your frontend
-    // The OpenAI client in index.html will make requests like /v1/chat/completions
-    // These need to be appended to the GitHub Models inference endpoint.
     const url = new URL(request.url);
-    const githubModelsBase = 'https://models.github.ai/inference';
+    const openRouterBase = 'https://openrouter.ai/api/v1';
+    // The client calls a path like /v1/chat/completions, which is url.pathname
+    const openRouterUrl = `${openRouterBase}${url.pathname}${url.search}`;
 
-    // Construct the new URL for the GitHub Models API
-    // e.g., if request is to worker_url/v1/chat/completions,
-    // this becomes https://models.github.ai/inference/v1/chat/completions
-    const githubUrl = `${githubModelsBase}${url.pathname}${url.search}`;
+    const requestHeaders = new Headers(request.headers);
+    const outgoingHeaders = new Headers();
 
-    // Create a new headers object from the original request,
-    // but remove headers that might cause issues or are specific to Cloudflare
-    const newHeaders = new Headers(request.headers);
-    newHeaders.delete('x-forwarded-host');
-    newHeaders.delete('x-forwarded-proto');
-    newHeaders.delete('cf-connecting-ip');
-    newHeaders.delete('cf-ipcountry');
-    newHeaders.delete('cf-ray');
-    newHeaders.delete('cf-visitor');
-    newHeaders.delete('cdn-loop');
-    newHeaders.delete('host'); // GitHub Models will expect its own host header
-    newHeaders.delete('authorization'); // Remove any incoming auth header (e.g., the dummy key)
+    // Copy headers from incoming request, filtering out disallowed ones
+    for (const [key, value] of requestHeaders.entries()) {
+        const lowerKey = key.toLowerCase();
+        if (!['host', 'authorization', 'cf-connecting-ip', 'cf-ipcountry', 'cf-ray', 'cf-visitor', 'cdn-loop', 'x-forwarded-host', 'x-forwarded-proto', 'x-real-ip'].includes(lowerKey)) {
+            outgoingHeaders.set(key, value);
+        }
+    }
 
-    // Add the GitHub Token from the environment variable
-    newHeaders.set('Authorization', `Bearer ${env.GITHUB_TOKEN}`);
+    // Set OpenRouter specific headers
+    outgoingHeaders.set('Authorization', `Bearer ${env.OPENROUTER_API_KEY}`);
+    if (url.origin) {
+        outgoingHeaders.set('HTTPReferer', url.origin);
+    }
+    // outgoingHeaders.set('X-Title', 'My AI Webpage'); // Optional: For your analytics on OpenRouter
 
-    // Create a new request to forward to GitHub Models
-    // Ensure method, headers, and body are passed through
-    const githubRequest = new Request(githubUrl, {
+    let processedBody = request.body; // Default to original body (stream)
+
+    // Modify body only for POST requests to chat completions endpoint
+    if (request.method === 'POST' && url.pathname.endsWith('/chat/completions')) {
+      if (!request.body) {
+        return new Response(JSON.stringify({ error: 'POST request to /chat/completions requires a JSON body.' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+      try {
+        const originalBodyJson = await request.json(); // This consumes request.body
+        // The model is now expected to be in originalBodyJson.model, sent by the client.
+        // We just need to ensure the original JSON body is stringified and sent.
+        processedBody = JSON.stringify(originalBodyJson);
+        outgoingHeaders.set('Content-Type', 'application/json'); // Body is now a JSON string
+      } catch (e) {
+        console.error('Error processing request body for /chat/completions:', e);
+        return new Response(JSON.stringify({ error: 'Invalid JSON body for chat completions.', details: e.message }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+    }
+
+    const openRouterRequest = new Request(openRouterUrl, {
       method: request.method,
-      headers: newHeaders,
-      body: request.body,
-      redirect: 'follow' // Important for GitHub Models API
+      headers: outgoingHeaders,
+      body: processedBody, // Use the (potentially modified) body
+      redirect: 'follow'
     });
 
     try {
-      const githubResponse = await fetch(githubRequest);
+      const openRouterResponse = await fetch(openRouterRequest);
 
-      // If the response is streamable (like for chat completions),
-      // we need to handle it as a stream.
-      if (githubResponse.headers.get("content-type") &&
-          githubResponse.headers.get("content-type").includes("text/event-stream")) {
-        
-        // Return the stream directly to the client
-        return new Response(githubResponse.body, {
-          status: githubResponse.status,
-          statusText: githubResponse.statusText,
-          headers: githubResponse.headers
+      // Handle streaming responses by forwarding them directly
+      const contentType = openRouterResponse.headers.get("content-type");
+      if (contentType && contentType.includes("text/event-stream")) {
+        return new Response(openRouterResponse.body, {
+          status: openRouterResponse.status,
+          statusText: openRouterResponse.statusText,
+          headers: openRouterResponse.headers // Forward all headers from OpenRouter
         });
       }
 
-      // For non-streamed responses, just return them as is.
-      return githubResponse;
+      // For non-streamed responses, return them as is.
+      // The body (if any) is still a stream and will be passed to the client.
+      return openRouterResponse;
 
     } catch (error) {
-      console.error('Error fetching from GitHub Models:', error);
-      return new Response(JSON.stringify({ error: 'Failed to connect to GitHub Models API', details: error.message }), {
+      console.error('Error fetching from OpenRouter:', error);
+      return new Response(JSON.stringify({ error: 'Failed to connect to OpenRouter API.', details: error.message }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
       });
