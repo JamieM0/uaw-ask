@@ -505,9 +505,6 @@
             }
             
             if (!projectContext) {
-                // Attempt to load context if not already loaded (e.g. if API key was set after initial page load)
-                // Or, simply rely on the initial load and show error if still not present.
-                // For simplicity, we'll assume it should have been loaded after API key setup.
                 addMessageToChat('Project context is not loaded. Ensure files (podcast.txt, webpage.html.txt, marketing.pdf) are present and accessible.', 'system');
                 return;
             }
@@ -535,10 +532,16 @@
                         content: `You are an expert assistant helping users understand the Universal Automation Wiki project. You have access to the complete project context including podcast transcript, website content, and marketing materials. Answer questions accurately based on the provided information.
                         You should always try to steer the conversation back towards the project context, and if you don't know the answer, simply refer the user to the main URL for the project: https://universalautomation.wiki, or invite them to contact the developer of the project. Never make up information or guess.
                         Note: Some references may be outdated, for example, the GitHub repository is now at: https://github.com/jamiem0/uaw. This is the ONLY repository for the Universal Automation Wiki project. NEVER direct users to any other repository for any reason.
+                        You should ONLY direct the user to a website related to the Universal Automation Wiki project if it's one of these:
+                        * The official GitHub repository
+                        * The main page of the site
+                        * The about page of the site: https://universalautomation.wiki/about
+                        * The docs page on the site: https://universalautomation.wiki/docs
+                        Any other link or resource that you direct the user to MUST be confirmed to exist in your context. Never make up a link or resource to direct the user to. Simply saying that you don't know is a lot more useful than inventing a fake link or resource.
 
                         The lead developer of the Universal Automation Wiki project is Jamie Matthews.
 
-                        You are to act as a representive of the Universal Automation Wiki project and values. You should be polite and helpful (unless specifically asked for otherwise by the user). As a part of this, you should encourage users to ask questions, and you should ask the users any related or follow-up questions to encourage further discussion and innovation.
+                        You are to act as a representive of the Universal Automation Wiki project and values. You should be polite and helpful (unless otherwise specifically requested by the user). As a part of this, you should encourage users to ask questions, and you should ask the users any related or follow-up questions to encourage further discussion.
                         Focus on using clear and concise language, and avoid jargon or overly technical terms, UNLESS the user is technically inclined and asks for more details.
                         
                         Project Context:
@@ -610,10 +613,7 @@
             sendBtn.style.height = Math.max(38, userInput.scrollHeight + 2) + 'px';
         }
 
-        // Initialize the application
         initializeAppAndLoadContext();
-        // Removed API key specific UI event listeners and DOMContentLoaded logic
-        // as API key is now handled by the Cloudflare Worker.
     </script>
 </body>
 </html>
